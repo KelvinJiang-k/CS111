@@ -1,17 +1,21 @@
-## UID: 123456789
+## UID: 306053364
 
 ## Pipe Up
 
-One sentence description
+implemented the pipe shell command in C
+ls | cat | wc
+equivalent to
+./pipe ls cat wc
 
 ## Building
 
-Explain briefly how to build your program
+make
 
 ## Running
 
-Show an example run of your program, using at least two additional arguments, and what to expect
+./pipe ls cat wc
+      7       7      63
 
 ## Cleaning up
 
-Explain briefly how to clean up all binary files
+make clean
