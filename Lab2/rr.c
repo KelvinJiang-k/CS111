@@ -23,7 +23,8 @@ struct process
   /* Additional fields here */
 
   u32 remaining_burst_time;
-  
+  bool first_execution;
+
   /* End of "Additional fields here" */
 };
 
@@ -163,7 +164,90 @@ int main(int argc, char *argv[])
   u32 total_response_time = 0;
 
   /* Your code here */
-  
+
+  struct process *current_process;
+  struct process *arriving_process;
+
+  // initialize process list
+  for (u32 i = 0; i < size; i++) {
+    current_process = &data[i];
+    current_process->remaining_burst_time = current_process->burst_time;
+    current_process->first_execution = false;
+  }
+
+  // initialize current time to minimum arrival time
+  u32 current_time = data[0].arrival_time;
+  for (u32 i = 0; i < size; i++) {
+    current_process = &data[i];
+    if (current_process->arrival_time < current_time) {
+      current_time = current_process->arrival_time;
+    }
+  }
+
+  u32 process_time = 0;
+  bool active_process = false;
+  bool done = false;
+  // check for invalid quantum length
+  if (quantum_length <= 0) done = true;
+  while (!done) {
+
+    // check for arriving processes and append to scheduling queue
+    for (u32 i = 0; i < size; i++) {
+      arriving_process = &data[i];
+      if (current_time == arriving_process->arrival_time) {
+        TAILQ_INSERT_TAIL(&list, arriving_process, pointers);
+      }
+    }
+
+    // if process isn't complete & exceeds timeshare, deschedule process & append to scheduling queue
+    if (process_time >= quantum_length) {
+      TAILQ_INSERT_TAIL(&list, current_process, pointers);
+      // deschedule process
+      active_process = false;
+      process_time = 0;
+    }
+
+    // if no process running & processes ready/in queue, run next process
+    if (!active_process && !TAILQ_EMPTY(&list)) {
+      current_process = TAILQ_FIRST(&list);
+      TAILQ_REMOVE(&list, current_process, pointers);
+
+      // if first runtime, calculate response time
+      if (!current_process->first_execution) {
+        current_process->first_execution = true;
+        total_response_time += current_time - current_process->arrival_time;
+      }
+
+      active_process = true;
+    }
+    
+    // ongoing process
+    if (active_process) {
+      current_process->remaining_burst_time--;
+      process_time++;
+
+      // if process completes, calculate wait time
+      if (current_process->remaining_burst_time <= 0) {
+        total_waiting_time += 1 + current_time - current_process->arrival_time - current_process->burst_time;
+        // deschedule process
+        active_process = false;
+        process_time = 0;
+      }
+    }
+    current_time++;
+
+    // check if all processes finish running
+    struct process *temp_process;
+    done = true;
+    for (u32 i = 0; i < size; i++) {
+      temp_process = &data[i];
+      if (temp_process->remaining_burst_time > 0) {
+        done = false;
+      }
+    }
+  }
+
+
   /* End of "Your code here" */
 
   printf("Average waiting time: %.2f\n", (float)total_waiting_time / (float)size);

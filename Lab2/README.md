@@ -1,28 +1,26 @@
 # You Spin Me Round Robin
 
-TODO
+
 
 ## Building
 
 ```shell
-TODO
+make
 ```
 
 ## Running
 
-cmd for running TODO
 ```shell
-TODO
+./rr processes.txt 3
 ```
 
-results TODO
 ```shell
-TODO
-
+Average waiting time: 7.00
+Average response time: 2.75
 ```
 
 ## Cleaning up
 
 ```shell
-TODO
+make clean
 ```
