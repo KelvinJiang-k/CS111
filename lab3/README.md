@@ -1,9 +1,9 @@
 # Hash Hash Hash
-TODO introduction
+Demo of 3 hash tables: a basic hash table, a correct hash table through locking, a performant correct hash table with optimized locking
 
 ## Building
 ```shell
-TODO
+make
 ```
 
 ## Running
